@@ -175,6 +175,7 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
                 (self.batch_size, n_objects, self.n_categories)
             )
 
+            to_remove = []
             for bounding_box_index, bounding_box in enumerate(bounding_boxes):
                 if bounding_box["category"] not in self.categories:
                     continue
@@ -203,6 +204,9 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
                     maximum_r,
                     maximum_c
                 ]
+                if minimum_c >= maximum_c  or minimum_r >= maximum_r:
+                    to_remove.append(bounding_box_index)
+                    continue
 
                 if horizontal_flip:
                     target_bounding_box = [
@@ -269,6 +273,8 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
             indicies = numpy.random.permutation(n)
         else:
             indicies = numpy.arange(0, n)
+
+        indicies = numpy.setdiff1d(indicies, to_remove)
 
         x = [
             target_bounding_boxes[:, indicies],
