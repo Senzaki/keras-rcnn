@@ -134,6 +134,8 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
             target_image = numpy.zeros((*self.target_size, self.channels))
 
             image = skimage.io.imread(pathname)
+            if image.shape[2] == 4 and self.channels < 4:
+                image = image[:, :, :3]
 
             scale = self.find_scale(image)
 
